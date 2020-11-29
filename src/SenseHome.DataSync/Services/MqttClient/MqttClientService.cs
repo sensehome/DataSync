@@ -1,21 +1,25 @@
-﻿using System.Threading;
+﻿using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using MQTTnet;
 using MQTTnet.Client;
 using MQTTnet.Client.Connecting;
 using MQTTnet.Client.Disconnecting;
 using MQTTnet.Client.Options;
+using Serilog;
 
 namespace SenseHome.DataSync.Services.MqttClient
 {
     public class MqttClientService : IMqttClientService
     {
-        private IMqttClient mqttClient;
-        private IMqttClientOptions options;
+        private readonly IMqttClient mqttClient;
+        private readonly IMqttClientOptions options;
+        private readonly ILogger logger;
 
-        public MqttClientService(IMqttClientOptions options)
+        public MqttClientService(ILogger logger, IMqttClientOptions options)
         {
             this.options = options;
+            this.logger = logger;
             mqttClient = new MqttFactory().CreateMqttClient();
             ConfigureMqttClient();
         }
@@ -29,7 +33,10 @@ namespace SenseHome.DataSync.Services.MqttClient
 
         public Task HandleApplicationMessageReceivedAsync(MqttApplicationMessageReceivedEventArgs eventArgs)
         {
-            throw new System.NotImplementedException();
+            return Task.Run(() =>
+            {
+                logger.Information(Encoding.ASCII.GetString(eventArgs.ApplicationMessage.Payload));
+            });
         }
 
         public async Task HandleConnectedAsync(MqttClientConnectedEventArgs eventArgs)
