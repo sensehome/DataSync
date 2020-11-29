@@ -5,6 +5,7 @@ using Microsoft.Extensions.Hosting;
 using MQTTnet.Client.Options;
 using SenseHome.DataSync.Configurations.Models;
 using SenseHome.DataSync.Options;
+using SenseHome.DataSync.Services.MqttClient;
 
 namespace SenseHome.DataSync.Configurations
 {
