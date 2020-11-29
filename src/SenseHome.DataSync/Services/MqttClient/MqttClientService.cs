@@ -7,6 +7,7 @@ using MQTTnet.Client.Connecting;
 using MQTTnet.Client.Disconnecting;
 using MQTTnet.Client.Options;
 using Serilog;
+using StackExchange.Redis;
 
 namespace SenseHome.DataSync.Services.MqttClient
 {
@@ -15,11 +16,13 @@ namespace SenseHome.DataSync.Services.MqttClient
         private readonly IMqttClient mqttClient;
         private readonly IMqttClientOptions options;
         private readonly ILogger logger;
+        private readonly IDatabase redisDb;
 
-        public MqttClientService(ILogger logger, IMqttClientOptions options)
+        public MqttClientService(ILogger logger, IDatabase redisDb, IMqttClientOptions options)
         {
             this.options = options;
             this.logger = logger;
+            this.redisDb = redisDb;
             mqttClient = new MqttFactory().CreateMqttClient();
             ConfigureMqttClient();
         }
@@ -35,7 +38,8 @@ namespace SenseHome.DataSync.Services.MqttClient
         {
             return Task.Run(() =>
             {
-                logger.Information(Encoding.ASCII.GetString(eventArgs.ApplicationMessage.Payload));
+                var payload = Encoding.ASCII.GetString(eventArgs.ApplicationMessage.Payload);
+                logger.Information(payload);
             });
         }
 
