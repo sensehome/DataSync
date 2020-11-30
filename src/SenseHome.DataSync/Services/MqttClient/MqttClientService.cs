@@ -5,25 +5,25 @@ using MQTTnet;
 using MQTTnet.Client;
 using MQTTnet.Client.Connecting;
 using MQTTnet.Client.Disconnecting;
-using MQTTnet.Client.Options;
+using MQTTnet.Extensions.ManagedClient;
+using SenseHome.DataSync.Services.RedisCache;
 using Serilog;
-using StackExchange.Redis;
 
 namespace SenseHome.DataSync.Services.MqttClient
 {
     public class MqttClientService : IMqttClientService
     {
-        private readonly IMqttClient mqttClient;
-        private readonly IMqttClientOptions options;
+        private readonly IManagedMqttClient mqttClient;
+        private readonly IManagedMqttClientOptions options;
         private readonly ILogger logger;
-        private readonly IDatabase redisDb;
+        private readonly IRedisCacheService redisCacheService;
 
-        public MqttClientService(ILogger logger, IDatabase redisDb, IMqttClientOptions options)
+        public MqttClientService(ILogger logger, IRedisCacheService redisCacheService, IManagedMqttClientOptions options)
         {
             this.options = options;
             this.logger = logger;
-            this.redisDb = redisDb;
-            mqttClient = new MqttFactory().CreateMqttClient();
+            this.redisCacheService = redisCacheService;
+            mqttClient = new MqttFactory().CreateManagedMqttClient();
             ConfigureMqttClient();
         }
 
@@ -34,13 +34,11 @@ namespace SenseHome.DataSync.Services.MqttClient
             mqttClient.ApplicationMessageReceivedHandler = this;
         }
 
-        public Task HandleApplicationMessageReceivedAsync(MqttApplicationMessageReceivedEventArgs eventArgs)
+        public async Task HandleApplicationMessageReceivedAsync(MqttApplicationMessageReceivedEventArgs eventArgs)
         {
-            return Task.Run(() =>
-            {
-                var payload = Encoding.ASCII.GetString(eventArgs.ApplicationMessage.Payload);
-                logger.Information(payload);
-            });
+            var payload = Encoding.ASCII.GetString(eventArgs.ApplicationMessage.Payload);
+            await redisCacheService.PushBackAsync(eventArgs.ApplicationMessage.Topic, payload);
+            logger.Information(payload);
         }
 
         public async Task HandleConnectedAsync(MqttClientConnectedEventArgs eventArgs)
@@ -56,25 +54,12 @@ namespace SenseHome.DataSync.Services.MqttClient
 
         public async Task StartAsync(CancellationToken cancellationToken)
         {
-            await mqttClient.ConnectAsync(options);
-            if (!mqttClient.IsConnected)
-            {
-                await mqttClient.ReconnectAsync();
-            }
+            await mqttClient.StartAsync(options);
         }
 
         public async Task StopAsync(CancellationToken cancellationToken)
         {
-            if (cancellationToken.IsCancellationRequested)
-            {
-                var disconnectOption = new MqttClientDisconnectOptions
-                {
-                    ReasonCode = MqttClientDisconnectReason.NormalDisconnection,
-                    ReasonString = "NormalDiconnection"
-                };
-                await mqttClient.DisconnectAsync(disconnectOption, cancellationToken);
-            }
-            await mqttClient.DisconnectAsync();
+            await mqttClient.StopAsync();
         }
     }
 }
