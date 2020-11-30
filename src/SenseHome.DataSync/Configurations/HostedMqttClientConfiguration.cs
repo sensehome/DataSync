@@ -3,6 +3,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using MQTTnet.Client.Options;
+using MQTTnet.Extensions.ManagedClient;
 using SenseHome.DataSync.Configurations.Models;
 using SenseHome.DataSync.Options;
 using SenseHome.DataSync.Services.MqttClient;
@@ -23,27 +24,30 @@ namespace SenseHome.DataSync.Configurations
                 var brokerSettings = dataSyncSettings.BrokerSettings;
 
                 aspOptionBuilder
-                .WithCredentials(clientSettinigs.UserName, clientSettinigs.Password)
-                .WithClientId(clientSettinigs.Id)
-                .WithTcpServer(brokerSettings.Host, brokerSettings.Port);
+                .WithAutoReconnectDelay(TimeSpan.FromSeconds(clientSettinigs.AutoReconnectInSec))
+                .WithClientOptions(new MqttClientOptionsBuilder()
+                    .WithClientId(clientSettinigs.Id)
+                    .WithCredentials(clientSettinigs.UserName, clientSettinigs.Password)
+                    .WithTcpServer(brokerSettings.Host, brokerSettings.Port)
+                    .Build());
             });
             return services;
         }
 
-        private static IServiceCollection AddMqttClientServiceWithConfig(this IServiceCollection services, Action<AspCoreMqttClientOptionsBuilder> configure)
+        private static IServiceCollection AddMqttClientServiceWithConfig(this IServiceCollection services, Action<AspCoreManagedMqttClientOptionBuilder> configuration)
         {
-            services.AddSingleton<IMqttClientOptions>(serviceProvider =>
+            services.AddSingleton<IManagedMqttClientOptions>(serviceProvider =>
             {
-                var optionBuilder = new AspCoreMqttClientOptionsBuilder(serviceProvider);
-                configure(optionBuilder);
-                return optionBuilder.Build();
+                var optionsBuilder = new AspCoreManagedMqttClientOptionBuilder(serviceProvider);
+                configuration(optionsBuilder);
+                return optionsBuilder.Build();
             });
             services.AddSingleton<MqttClientService>();
             services.AddSingleton<IHostedService>(serviceProvider =>
             {
                 return serviceProvider.GetService<MqttClientService>();
             });
-            services.AddSingleton<MqttClientServiceProvider>(serviceProvider =>
+            services.AddTransient<MqttClientServiceProvider>(serviceProvider =>
             {
                 var mqttClientService = serviceProvider.GetService<MqttClientService>();
                 var mqttClientServiceProvider = new MqttClientServiceProvider(mqttClientService);
