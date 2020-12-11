@@ -1,33 +1,32 @@
-﻿using System.Collections.Generic;
-using System.Threading.Tasks;
-using StackExchange.Redis;
+﻿using System.Threading.Tasks;
+using SenseHome.DB.Redis;
 
 namespace SenseHome.DataSync.Services.RedisCache
 {
     public class RedisCacheService : IRedisCacheService
     {
-        private readonly IDatabase redisDatabase;
+        private readonly RedisDBContext redisDBContext;
 
-        public RedisCacheService(IDatabase redisDatabase)
+        public RedisCacheService(RedisDBContext redisDatabase)
         {
-            this.redisDatabase = redisDatabase;
+            this.redisDBContext = redisDatabase;
         }
 
         public async Task<string> PopBackAsync(string key)
         {
-            var value = await redisDatabase.ListRightPopAsync(key);
+            var value = await redisDBContext.Database.ListRightPopAsync(key);
             return value;
         }
 
         public async Task<string> PopTopAsync(string key)
         {
-            var value = await redisDatabase.ListLeftPopAsync(key);
+            var value = await redisDBContext.Database.ListLeftPopAsync(key);
             return value;
         }
 
         public async Task PushBackAsync(string key, string value)
         {
-            await redisDatabase.ListRightPushAsync(key, value);
+            await redisDBContext.Database.ListRightPushAsync(key, value);
         }
     }
 }
