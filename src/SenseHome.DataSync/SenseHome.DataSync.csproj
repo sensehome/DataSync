@@ -10,8 +10,6 @@
     <PackageReference Include="Serilog.Sinks.File" Version="5.0.0-dev-00905" />
     <PackageReference Include="Serilog.Sinks.Async" Version="1.4.1-dev-00073" />
     <PackageReference Include="MQTTnet.Extensions.ManagedClient" Version="3.0.14-rc3" />
-    <PackageReference Include="SenseHome.DB" Version="1.0.2" />
-    <PackageReference Include="SenseHome.DomainModels" Version="1.0.0" />
     <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
   </ItemGroup>
   <ItemGroup>
@@ -24,5 +22,10 @@
     <Folder Include="Services\Scheduler\" />
     <Folder Include="Services\DbSync\" />
     <Folder Include="Models\" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\SenseHome.Repositories\SenseHome.Repositories.csproj">
+      <GlobalPropertiesToRemove></GlobalPropertiesToRemove>
+    </ProjectReference>
   </ItemGroup>
 </Project>

@@ -28,8 +28,8 @@ namespace SenseHome.DataSync.Services.Scheduler
                     await dbSyncService.Execute(state);
                 },
                 null,
-                TimeSpan.FromSeconds(5), //will start after 5sec
-                TimeSpan.FromMinutes(10) //looping every 10min
+                TimeSpan.FromSeconds(10), //will start after X sec
+                TimeSpan.FromMinutes(1) //looping every X min
                 );
 
             return Task.CompletedTask;
