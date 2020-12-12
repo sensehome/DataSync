@@ -1,9 +1,7 @@
 ﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using SenseHome.DataSync.Services.RedisCache;
 using SenseHome.DB.Mongo;
 using SenseHome.DB.Redis;
-using StackExchange.Redis;
 
 namespace SenseHome.DataSync.Configurations
 {
