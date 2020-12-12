@@ -42,7 +42,6 @@ namespace SenseHome.DataSync.Services.DbSync
                                 break;
                             
                         }
-                        Console.WriteLine(value);
                     }
                 }
                 catch(Exception e)
