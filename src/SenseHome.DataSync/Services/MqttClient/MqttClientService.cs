@@ -7,6 +7,7 @@ using MQTTnet.Client.Connecting;
 using MQTTnet.Client.Disconnecting;
 using MQTTnet.Extensions.ManagedClient;
 using SenseHome.DataSync.Services.RedisCache;
+using SenseHome.DataSync.Models;
 using Serilog;
 
 namespace SenseHome.DataSync.Services.MqttClient
@@ -37,8 +38,15 @@ namespace SenseHome.DataSync.Services.MqttClient
         public async Task HandleApplicationMessageReceivedAsync(MqttApplicationMessageReceivedEventArgs eventArgs)
         {
             var payload = Encoding.ASCII.GetString(eventArgs.ApplicationMessage.Payload);
-            await redisCacheService.PushBackAsync(eventArgs.ApplicationMessage.Topic, payload);
-            logger.Information(payload);
+            var message = new MqttBroadcastMessage
+            {
+                Payload = System.Text.Encoding.ASCII.GetString(eventArgs.ApplicationMessage.Payload),
+                Topic = eventArgs.ApplicationMessage.Topic,
+                ClientId = eventArgs.ClientId,
+                Date = System.DateTime.Now
+            }.ToJsonString();
+            await redisCacheService.PushBackAsync(eventArgs.ApplicationMessage.Topic, message);
+            logger.Information(message);
         }
 
         public async Task HandleConnectedAsync(MqttClientConnectedEventArgs eventArgs)
