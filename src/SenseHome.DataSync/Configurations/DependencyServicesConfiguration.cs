@@ -2,6 +2,8 @@
 using SenseHome.DataSync.Services.DbSync;
 using SenseHome.DataSync.Services.RedisCache;
 using SenseHome.DataSync.Services.Scheduler;
+using SenseHome.Repositories.MotionDetection;
+using SenseHome.Repositories.TemperatureHumidity;
 
 namespace SenseHome.DataSync.Configurations
 {
@@ -16,6 +18,8 @@ namespace SenseHome.DataSync.Configurations
             {
                 return serviceProvider.GetService<SchedulerService>();
             });
+            services.AddSingleton<ITemperatureHumidityRepository, TemperatureHumidityRepository>();
+            services.AddSingleton<IMotionDetectionRepository, MotionDetectionRepository>();
         }
     }
 }
