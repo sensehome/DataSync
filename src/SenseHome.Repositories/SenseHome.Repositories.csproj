@@ -1,0 +1,15 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Folder Include="TemperatureHumidity\" />
+    <Folder Include="MotionDetection\" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="SenseHome.DomainModels" Version="1.0.0" />
+    <PackageReference Include="SenseHome.DB" Version="1.0.2" />
+  </ItemGroup>
+</Project>
