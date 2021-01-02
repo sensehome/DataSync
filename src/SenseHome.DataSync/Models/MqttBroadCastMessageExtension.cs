@@ -19,7 +19,10 @@ namespace SenseHome.DataSync.Models
 
         public static DomainModels.MotionDetection ToMotionDetectionModel(this MqttBroadcastMessage message)
         {
-            return null;
+            return new DomainModels.MotionDetection
+            {
+                Date = message.Date
+            };
         }
     }
 }

@@ -40,6 +40,9 @@ namespace SenseHome.DataSync.Services.DbSync
                             case Topics.HomeTemperatureHumidity:
                                 await temperatureHumidityRepository.CreateAsync(message.ToTemperatureHumidityModel());
                                 break;
+                            case Topics.HomeMotionSense:
+                                await motionDetectionRepository.CreateAsync(message.ToMotionDetectionModel());
+                                break;
                             
                         }
                     }
