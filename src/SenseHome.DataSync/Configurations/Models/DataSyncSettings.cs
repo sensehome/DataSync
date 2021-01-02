@@ -4,5 +4,6 @@
     {
         public BrokerSettings BrokerSettings { get; set; }
         public ClientSettings ClientSettings { get; set; }
+        public SyncSchedulerSettings SyncSchedulerSettings { get; set; }
     }
 }
