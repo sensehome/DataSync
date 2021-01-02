@@ -9,7 +9,7 @@
     <Folder Include="MotionDetection\" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="SenseHome.DomainModels" Version="1.0.0" />
+    <PackageReference Include="SenseHome.DomainModels" Version="1.0.3" />
     <PackageReference Include="SenseHome.DB" Version="1.0.2" />
   </ItemGroup>
 </Project>
